@@ -10,6 +10,12 @@ class BPE_tokenizer:
         self.merges = merges
         self.special_tokens = special_tokens
         self.reverse_vocab = {v:k for k,v in vocab.items()}
+        
+        for token in special_tokens:
+            encoded = token.encode("utf-8")
+            if self.reverse_vocab.get(encoded, default = None) is None:
+                self.vocab[len(vocab)] = encoded
+                self.reverse_vocab[encoded] = len(vocab)
 
     @classmethod
     def from_files(cls, vocab_filepath, merges_filepath, special_tokens=None):
@@ -34,6 +40,8 @@ class BPE_tokenizer:
             escaped_tokens = [re.escape(tok) for tok in self.special_tokens]
             special_pattern = "|".join(escaped_tokens)
             segments = re.split(f"({special_pattern})", text)
+            
+        segments = [seg for seg in segments if seg]
 
         reverse_vocab = self.reverse_vocab
         merges = self.merges    
@@ -46,18 +54,25 @@ class BPE_tokenizer:
 
                 while merge_checker:
                     merge_checker = False
+                    this_byte_merge = False
                     bytes_list_new = []
                     index = 0
                     while index < len(bytes_list)-1:
                         for merge in merges:
                             if merge[0] == bytes_list[index] and merge[1] == bytes_list[index+1] :
                                 merge_checker = True
+                                this_byte_merge = True
                                 bytes_list_new.append(bytes_list[index]+bytes_list[index+1])
                                 index += 2
-                            else:
-                                bytes_list_new.append(bytes_list[index])
-                                index += 1
-                    bytes_list = bytes_list_new
+                                break
+                        
+                        if this_byte_merge == True :
+                            this_byte_merge = False
+                            break
+                        bytes_list_new.append(bytes_list[index])
+                        index +=1
+                            
+                    bytes_list = bytes_list_new + bytes_list[-1]
                 
                 piece_encoded = []
                 for byte in bytes_list :
