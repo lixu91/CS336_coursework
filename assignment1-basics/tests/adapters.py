@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import IO, Any, BinaryIO
 
 from .tokenizer import BPE_tokenizer
-from .modules import Linear, Embedding
+from .modules import Linear, Embedding,RMSnorm
 
 import numpy.typing as npt
 import torch
@@ -390,7 +390,9 @@ def run_rmsnorm(
         Float[Tensor,"... d_model"]: Tensor of with the same shape as `in_features` with the output of running
         RMSNorm of the `in_features`.
     """
-    raise NotImplementedError
+    Rmsnorm = RMSnorm(d_model=d_model,eps=eps)
+    Rmsnorm.load_state_dict({"learb_gains":weights})
+    return Rmsnorm(in_features)
 
 
 def run_silu(in_features: Float[Tensor, " ..."]) -> Float[Tensor, " ..."]:
