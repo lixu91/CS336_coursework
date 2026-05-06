@@ -24,7 +24,7 @@ class Embedding(nn.Module):
     
 class RMSnorm(nn.Module):
     def __init__(self, d_model: int, eps: float = 1e-5, device=None, dtype=None):
-        super.__init__()
+        super().__init__()
         self.learb_gains = nn.Parameter(torch.ones(d_model,device=device,dtype=dtype))
         self.eps = eps
 
