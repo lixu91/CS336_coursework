@@ -13,3 +13,14 @@ class Linear(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return einsum(x , self.linear_weights, "... d_in , d_out d_in -> ... d_out")
     
+class Embedding(nn.Module):
+    def __init__(self, num_embeddings, embedding_dim, device=None, dtype=None):
+        super().__init__()
+        self.d = embedding_dim
+        self.embed_matrix = nn.Parameter(torch.empty(num_embeddings,embedding_dim, device=device,dtype=dtype))
+        nn.init.trunc_normal_(self.embed_matrix,mean=0,std= 1, a=-3,b = 3)
+
+    def forward(self, token_ids:torch.Tensor)-> torch.Tensor:
+        return self.embed_matrix[token_ids] #高级索引  自动广播成（b,s,d）形状
+        
+    

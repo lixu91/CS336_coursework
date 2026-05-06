@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import IO, Any, BinaryIO
 
 from .tokenizer import BPE_tokenizer
-from .modules import Linear
+from .modules import Linear, Embedding
 
 import numpy.typing as npt
 import torch
@@ -34,7 +34,7 @@ def run_linear(
         Float[Tensor, "... d_out"]: The transformed output of your linear module.
     """
     linear = Linear(d_in, d_out) 
-    linear.load_state_dict({"linear_weights":weights})
+    linear.load_state_dict({"linear_weights":weights})  ##将weights 传给linear——weights
     
     x = linear(in_features)
     return x
@@ -60,8 +60,10 @@ def run_embedding(
     Returns:
         Float[Tensor, "... d_model"]: Batch of embeddings returned by your Embedding layer.
     """
-
-    raise NotImplementedError
+    embedding = Embedding(vocab_size,d_model)
+    embedding.load_state_dict({"embed_matrix":weights})
+    return embedding(token_ids)
+    
 
 
 def run_swiglu(
