@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import IO, Any, BinaryIO
 
 from .tokenizer import BPE_tokenizer
+from .modules import Linear
 
 import numpy.typing as npt
 import torch
@@ -32,8 +33,11 @@ def run_linear(
     Returns:
         Float[Tensor, "... d_out"]: The transformed output of your linear module.
     """
+    linear = Linear(d_in, d_out)
+    x = linear(in_features)
+    return x
 
-    raise NotImplementedError
+    
 
 
 def run_embedding(
@@ -611,6 +615,8 @@ def run_train_bpe(
         escaped_tokens = [re.escape(tok) for tok in special_tokens]
         special_pattern = "|".join(escaped_tokens)
         segments = re.split(special_pattern, corpus)
+    
+    
     PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
     words_counter = defaultdict(int)
     key_pair_counter = defaultdict(int)  # tuple_key:dict[tuple,freq]  keypair:dict[bytespair , freq]
