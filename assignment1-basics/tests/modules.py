@@ -24,15 +24,16 @@ class Embedding(nn.Module):
     
 class RMSnorm(nn.Module):
     def __init__(self, d_model: int, eps: float = 1e-5, device=None, dtype=None):
+        super.__init__()
         self.learb_gains = nn.Parameter(torch.ones(d_model,device=device,dtype=dtype))
         self.eps = eps
-        self.d_m = d_model
+
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         in_dtype = x.dtype
         x = x.to(torch.float32)
         rms = torch.sqrt(x.pow(2).mean(dim=-1,keepdim=True)+self.eps)
-        x_normalized = (x / rms) * self.g
+        x_normalized = (x / rms) * self.learb_gains
         return x_normalized.to(in_dtype)
         
     
