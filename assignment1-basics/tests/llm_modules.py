@@ -128,8 +128,8 @@ class Multihead_attention(nn.Module):
         V_split = rearrange(V, "... seq (num_heads d_head) -> ... num_heads seq d_head", num_heads = self.num_heads)
         if self.max_seq_len is not None and self.theta is not None :
             if token_positions is None:
-                x_ones = torch.ones(x.size()[:-1],dtype=torch.long,device = x.device)
-                ref = torch.arange(x.size(-2),device = x.device)
+                x_ones = torch.ones(Q_split.size()[:-1],dtype=torch.long,device = x.device)
+                ref = torch.arange(Q_split.size(-2),device = x.device)
                 token_positions = x_ones * ref
             Q_split = self.rope(Q_split, token_positions)
             K_split = self.rope(K_split, token_positions)
